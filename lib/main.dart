@@ -17,59 +17,41 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ShoppingCart extends StatefulWidget {
-  @override
-  _ShoppingCartState createState() => _ShoppingCartState();
+class Product {
+  final String name;
+  final String size;
+  final double price;
+  final String imageUrl;
+
+  Product({
+    required this.name,
+    required this.size,
+    required this.price,
+    required this.imageUrl,
+  });
 }
 
-class _ShoppingCartState extends State<ShoppingCart> {
-  int _itemCount = 0;
-  double _unitPrice = 10.0;
-
-  void _incrementItemCount() {
-    setState(() {
-      _itemCount++;
-      if (_itemCount % 5 == 0) {
-        _showItemAddedDialog();
-      }
-    });
-  }
-
-  void _decrementItemCount() {
-    setState(() {
-      if (_itemCount > 0) {
-        _itemCount--;
-      }
-    });
-  }
-
-  void _showItemAddedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Congratulations!'),
-          content: Text('You have added 5 items to your bag!'),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showCheckoutSnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Congratulations! Checkout successful.'),
-      ),
-    );
-  }
+class ShoppingCart extends StatelessWidget {
+  final List<Product> _products = [
+    Product(
+      name: 'Product A',
+      size: 'M',
+      price: 10.0,
+      imageUrl: 'https://via.placeholder.com/150',
+    ),
+    Product(
+      name: 'Product B',
+      size: 'L',
+      price: 15.0,
+      imageUrl: 'https://via.placeholder.com/150',
+    ),
+    Product(
+      name: 'Product C',
+      size: 'S',
+      price: 20.0,
+      imageUrl: 'https://via.placeholder.com/150',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -77,41 +59,50 @@ class _ShoppingCartState extends State<ShoppingCart> {
       appBar: AppBar(
         title: Text('Shopping Cart'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: ListView.builder(
+        itemCount: _products.length,
+        itemBuilder: (context, index) {
+          return ProductItem(product: _products[index]);
+        },
+      ),
+    );
+  }
+}
+
+class ProductItem extends StatelessWidget {
+  final Product product;
+
+  const ProductItem({Key? key, required this.product}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.all(8.0),
+      child: ListTile(
+        leading: Image.network(
+          product.imageUrl,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        ),
+        title: Text(product.name),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Item Count: $_itemCount',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            Text(
-              'Total Amount: \$${_itemCount * _unitPrice}',
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.remove),
-                  onPressed: _decrementItemCount,
-                ),
-                SizedBox(width: 20.0),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: _incrementItemCount,
-                ),
-              ],
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                _showCheckoutSnackbar();
-              },
-              child: Text('CHECK OUT'),
-            ),
+            Text('Size: ${product.size}'),
+            Text('Price: \$${product.price.toString()}'),
           ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.add_shopping_cart),
+          onPressed: () {
+            // Add to cart functionality
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Added ${product.name} to cart!'),
+              ),
+            );
+          },
         ),
       ),
     );
