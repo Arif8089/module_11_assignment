@@ -22,14 +22,14 @@ class Product {
   final String size;
   final double price;
   final String imageUrl;
-  int quantity; // Added quantity property
+  int quantity;
 
   Product({
     required this.name,
     required this.size,
     required this.price,
     required this.imageUrl,
-    this.quantity = 0, // Default quantity is 0
+    this.quantity = 0,
   });
 }
 
